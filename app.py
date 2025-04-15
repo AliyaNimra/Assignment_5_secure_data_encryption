@@ -1,12 +1,12 @@
 # aes_encrypt_only_app.py
 
 import streamlit as st
-from Crypto.Cipher import AES
+from Crypto.Cipher import AES  # ✅ This line must be active (NOT commented)
 from Crypto.Hash import SHA256
 from Crypto import Random
-import base64
+import base64                               
 
-st.title("🔒 Text Encryption App (AES - Encrypt Only)")
+st.title("🔒 Secure_Data_Encryption")
 
 # Function to generate key from password
 def get_key(password):
@@ -17,7 +17,7 @@ def get_key(password):
 def encrypt(message, password):
     key = get_key(password)
     iv = Random.new().read(AES.block_size)
-    cipher = AES.new(key, AES.MODE_CFB, iv)
+    cipher = AES.new(key, AES.MODE_CFB, iv)  # ✅ Changed YES to AES
     encrypted = iv + cipher.encrypt(message.encode('utf-8'))
     return base64.b64encode(encrypted).decode('utf-8')
 
@@ -34,4 +34,3 @@ if st.button("Encrypt"):
         encrypted = encrypt(text, password)
         st.success("✅ Encrypted Text:")
         st.code(encrypted)
-
