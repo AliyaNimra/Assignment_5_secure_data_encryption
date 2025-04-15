@@ -1,36 +1,36 @@
-# aes_encrypt_only_app.py
+# password_based_encrypt_app.py
 
 import streamlit as st
-from Crypto.Cipher import AES  # ✅ This line must be active (NOT commented)
-from Crypto.Hash import SHA256
-from Crypto import Random
-import base64                               
 
-st.title("🔒 Secure_Data_Encryption")
+st.title("🔐 Text Encryption with Password (No Crypto Library)")
 
-# Function to generate key from password
-def get_key(password):
-    hasher = SHA256.new(password.encode('utf-8'))
-    return hasher.digest()
+# Convert password into a numeric shift key
+def password_to_shift(password):
+    return sum(ord(char) for char in password) % 26
 
-# Encrypt function
-def encrypt(message, password):
-    key = get_key(password)
-    iv = Random.new().read(AES.block_size)
-    cipher = AES.new(key, AES.MODE_CFB, iv)  # ✅ Changed YES to AES
-    encrypted = iv + cipher.encrypt(message.encode('utf-8'))
-    return base64.b64encode(encrypted).decode('utf-8')
+# Encrypt the text using Caesar cipher with password-derived shift
+def password_encrypt(text, password):
+    shift = password_to_shift(password)
+    encrypted = ""
+    for char in text:
+        if char.isalpha():
+            base = ord('A') if char.isupper() else ord('a')
+            encrypted += chr((ord(char) - base + shift) % 26 + base)
+        else:
+            encrypted += char
+    return encrypted
 
-# UI Inputs
-st.subheader("Enter your text to encrypt:")
-text = st.text_area("Message")
-
-password = st.text_input("Enter password (used as encryption key):", type="password")
+# UI
+text = st.text_area("Enter text to encrypt:")
+password = st.text_input("Enter password:", type="password")
 
 if st.button("Encrypt"):
     if not text or not password:
-        st.warning("Please enter both message and password.")
+        st.warning("Please enter both text and password.")
     else:
-        encrypted = encrypt(text, password)
+        encrypted_text = password_encrypt(text, password)
         st.success("✅ Encrypted Text:")
-        st.code(encrypted)
+        st.code(encrypted_text)
+        st.download_button("📄 Download Encrypted Text", encrypted_text, file_name="encrypted_text.txt")
+
+
